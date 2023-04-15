@@ -1,0 +1,51 @@
+module sinyalizasyon (
+  input clk,
+  input rst,
+  output reg [5:0] led
+);
+
+  reg [23:0] counter;  // 1-second counter
+  reg [1:0] state;     // state machine state
+  
+  always @(posedge clk or negedge rst) begin
+    if (!rst) begin
+      counter <= 0;
+      state <= 2'b00;   // initial state is red
+      led <= 6'b111100; // initial LED pattern is red
+    end
+    else begin
+      counter <= counter + 1;
+      case (state)
+        2'b00: begin  // red state
+          if (counter >= 25) begin
+            counter <= 0;
+            state <= 2'b01;  // transition to red-orange state
+            led <= 6'b110110; // set LED pattern to red-orange
+          end
+        end
+        2'b01: begin  // red-orange state
+          if (counter >= 5) begin
+            counter <= 0;
+            state <= 2'b10;  // transition to green state
+            led <= 6'b001111; // set LED pattern to green
+          end
+        end
+        2'b10: begin  // green state
+          if (counter >= 25) begin
+            counter <= 0;
+            state <= 2'b11;  // transition to orange state
+            led <= 6'b110011; // set LED pattern to orange
+          end
+        end
+        2'b11: begin  // orange state
+          if (counter >= 5) begin
+            counter <= 0;
+            state <= 2'b00;  // transition to red state
+            led <= 6'b111100; // set LED pattern to red
+          end
+        end
+      endcase
+    end
+  end
+  
+endmodule
